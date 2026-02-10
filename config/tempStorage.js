@@ -1,3 +1,7 @@
-const users = {};
+const Users = {};
+const Sockets = new Map();
 
-module.exports = users;
+module.exports = {
+  Users,
+  Sockets,
+};

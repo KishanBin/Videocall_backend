@@ -50,7 +50,7 @@ function setupWebsocket(server) {
     socket.on('close', () => {
       console.log('Client disconnected');
       console.log('Disconnected socket id:', socket.id);
-      
+      deleteUser(socket.id);
       activeSocket = null;
      
     });

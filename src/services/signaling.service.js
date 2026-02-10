@@ -1,13 +1,16 @@
 
-const User = require("../models/user.model");
-
+const { Users, Sockets } = require("../../config/tempStorage");
 
 async function register_user({phone}, socket) {
 
-    const isExist = User.findOne({ phone: phone });
+    const isExist = await Users.findOne({ phone: to });
+
 
     if (!isExist) {
-        await User.Create({
+
+        Sockets.set(socket.id, socket);
+
+        await Users.Create({
             phone: phone,
             socketId: socket.id,  //connection gets the socket it 
         });
@@ -17,11 +20,11 @@ async function register_user({phone}, socket) {
             message: "User Register Succesfully!"
         }));
 
-        console.log("Registered:", users.get(phone));
+        console.log("Registered:", Users.get(phone));
     } 
     // else {
 
-    //     await User.updateOne(
+    //     await Users.updateOne(
     //         { isOnline: true},          // find condition
     //         { socketId: socket.id }   // fields to update
     //     );
@@ -34,11 +37,11 @@ async function register_user({phone}, socket) {
     return;
 }
 
-function forwardOffer({ from, to, offer }) {
+async function forwardOffer({ from, to, offer }) {
 
-    user = User.findOne({ phone: to});
+    const user = await Users.findOne({ phone: to });
 
-    targetSocket = user.socketId
+    const targetSocket = Sockets.get(user.socketId);
 
     if (targetSocket) {
         targetSocket.send(JSON.stringify({
@@ -49,11 +52,12 @@ function forwardOffer({ from, to, offer }) {
     }
 }
 
-function forwardAnswer({ from, to, answer}) {
+async function forwardAnswer({ from, to, answer}) {
 
-    user = User.findOne({ phone: to});
+    const user = await Users.findOne({ phone: to });
 
-    targetSocket = user.socketId
+
+    const targetSocket = Sockets.get(user.socketId);
 
     if (targetSocket) {
         targetSocket.send(JSON.stringify({
@@ -64,11 +68,11 @@ function forwardAnswer({ from, to, answer}) {
     }
 }
 
-function forwardICE({ from, to, ice_candidate}) {
+async function forwardICE({ from, to, ice_candidate}) {
 
-    user = User.findOne({ phone: to});
+    const user = await Users.findOne({ phone: to });
 
-    targetSocket = user.socketId
+    const targetSocket = Sockets.get(user.socketId);
 
     if (targetSocket) {
         targetSocket.send(JSON.stringify({
@@ -80,11 +84,12 @@ function forwardICE({ from, to, ice_candidate}) {
 }
 
 function deleteUser(socketId){
-   User.deleteOne({socketId: socketId});
+   Users.deleteOne({socketId: socketId});
+   Sockets.deleteOne({socketId: socketId});
 }
 
 async function userOnline(phone) {
-    User.updateOne({ phone }, { isOnline: true });
+    Users.updateOne({ phone }, { isOnline: true });
 }
 
 module.exports = { register_user, userOnline, forwardOffer, forwardAnswer, forwardICE, deleteUser };
