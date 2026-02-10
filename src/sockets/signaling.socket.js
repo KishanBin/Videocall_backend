@@ -29,19 +29,30 @@ function setupWebsocket(server) {
       //  register the user 
       if (data.type === "register") {
 
-        services.register_user({ username: userData.username, phone: userData.phone }, socket);
+        services.register_user({phone: userData.phone }, socket);
 
       } else if (data.type === "offer") {
 
-        services.forwardOffer({from: userData.from , to: userData.to, offer: userData.offer},socket);
+        services.forwardOffer({from: userData.from , to: userData.to, offer: userData.offer});
         
+      } else if (data.type === "answer"){
+
+        services.forwardAnswer({from: userData.from , to: userData.to, answer: userData.answer});
+
+      }else if (data.type === "ice"){
+
+        services.forwardICE({from: userData.from , to: userData.to, ice_candidate: userData.ice_candidate});
+
       }
 
     });
 
     socket.on('close', () => {
       console.log('Client disconnected');
+      console.log('Disconnected socket id:', socket.id);
+      
       activeSocket = null;
+     
     });
 
   });

@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 const connectDB = async () => {
     try{                        //       //    ip:prot    /databaseName
-        await mongoose.connect('mongodb://127.0.0.1:27017/signaling_db',{
+        await mongoose.connect('mongodb://127.0.0.1:27017/signal_db',{
             useNewUrlParser:true,
             useUnifiedTopology:true,
         })
