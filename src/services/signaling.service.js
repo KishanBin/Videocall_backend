@@ -44,11 +44,14 @@ async function forwardOffer({ from, to, offer }) {
     const targetSocket = Sockets.get(user.socketId);
 
     if (targetSocket) {
+
         targetSocket.send(JSON.stringify({
             type: "offer",
             from: from,
             offer: offer,
         }));
+
+        console.log(`offer send ${from} to ${to}`);
     }
 }
 
@@ -65,6 +68,8 @@ async function forwardAnswer({ from, to, answer}) {
             from: from,
             answer: answer,
         }));
+
+        console.log(`answer send ${from} to ${to}`);
     }
 }
 
@@ -76,10 +81,12 @@ async function forwardICE({ from, to, ice_candidate}) {
 
     if (targetSocket) {
         targetSocket.send(JSON.stringify({
-            type: "ICE",
+            type: "candidate",
             from: from,
             ice: ice_candidate,
         }));
+
+        console.log(`ice_candidate send ${from} to ${to}`);
     }
 }
 
@@ -88,8 +95,8 @@ function deleteUser(socketId){
    Sockets.deleteOne({socketId: socketId});
 }
 
-async function userOnline(phone) {
-    Users.updateOne({ phone }, { isOnline: true });
-}
+// async function userOnline(phone) {
+//     Users.updateOne({ phone }, { isOnline: true });
+// }
 
-module.exports = { register_user, userOnline, forwardOffer, forwardAnswer, forwardICE, deleteUser };
+module.exports = { register_user, forwardOffer, forwardAnswer, forwardICE, deleteUser };

@@ -24,7 +24,7 @@ function setupWebsocket(server) {
       console.log(userData);
 
       //Update inOnline when user comes online
-      services.userOnline(userData.phone);
+      // services.userOnline(userData.phone);
 
       //  register the user 
       if (data.type === "register") {
@@ -50,7 +50,7 @@ function setupWebsocket(server) {
     socket.on('close', () => {
       console.log('Client disconnected');
       console.log('Disconnected socket id:', socket.id);
-      deleteUser(socket.id);
+      services.deleteUser(socket.id);
       activeSocket = null;
      
     });
