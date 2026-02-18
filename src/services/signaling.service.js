@@ -1,16 +1,16 @@
 
 const { Users, Sockets } = require("../../config/tempStorage");
 
-async function register_user({phone}, socket) {
+ function register_user({ phone }, socket) {
 
-    const isExist = await Users.findOne({ phone: to });
+    const isExist =  Users.get(phone);
 
 
     if (!isExist) {
 
-        Sockets.set(socket.id, socket);
+        Sockets.set(socket.id, { socket: socket, phone: phone });
 
-        await Users.Create({
+         Users.set(phone, {
             phone: phone,
             socketId: socket.id,  //connection gets the socket it 
         });
@@ -21,10 +21,10 @@ async function register_user({phone}, socket) {
         }));
 
         console.log("Registered:", Users.get(phone));
-    } 
+    }
     // else {
 
-    //     await Users.updateOne(
+    //      Users.updateOne(
     //         { isOnline: true},          // find condition
     //         { socketId: socket.id }   // fields to update
     //     );
@@ -37,11 +37,11 @@ async function register_user({phone}, socket) {
     return;
 }
 
-async function forwardOffer({ from, to, offer }) {
+ function forwardOffer({ from, to, offer }) {
 
-    const user = await Users.findOne({ phone: to });
+    const user =  Users.get(to);
 
-    const targetSocket = Sockets.get(user.socketId);
+    const targetSocket = Sockets.get(user.socketId).socket;
 
     if (targetSocket) {
 
@@ -51,16 +51,16 @@ async function forwardOffer({ from, to, offer }) {
             offer: offer,
         }));
 
-        console.log(`offer send ${from} to ${to}`);
+        console.log(`offer sent ${from} to ${to}`);
     }
 }
 
-async function forwardAnswer({ from, to, answer}) {
+ function forwardAnswer({ from, to, answer }) {
 
-    const user = await Users.findOne({ phone: to });
+    const user =  Users.get(to);
 
 
-    const targetSocket = Sockets.get(user.socketId);
+    const targetSocket = Sockets.get(user.socketId).socket;
 
     if (targetSocket) {
         targetSocket.send(JSON.stringify({
@@ -69,15 +69,15 @@ async function forwardAnswer({ from, to, answer}) {
             answer: answer,
         }));
 
-        console.log(`answer send ${from} to ${to}`);
+        console.log(`answer sent ${from} to ${to}`);
     }
 }
 
-async function forwardICE({ from, to, ice_candidate}) {
+ function forwardICE({ from, to, ice_candidate }) {
 
-    const user = await Users.findOne({ phone: to });
+    const user =  Users.get(to);
 
-    const targetSocket = Sockets.get(user.socketId);
+    const targetSocket = Sockets.get(user.socketId).socket;
 
     if (targetSocket) {
         targetSocket.send(JSON.stringify({
@@ -90,12 +90,21 @@ async function forwardICE({ from, to, ice_candidate}) {
     }
 }
 
-function deleteUser(socketId){
-   Users.deleteOne({socketId: socketId});
-   Sockets.deleteOne({socketId: socketId});
+ function deleteUser(socketId) {
+    
+    const socketData =  Sockets.get(socketId);
+
+    if(!socketData) return;
+
+    const { phone } = socketData;
+     
+     Users.delete(phone);
+    Sockets.delete(socketId);
+
+    
 }
 
-// async function userOnline(phone) {
+//  function userOnline(phone) {
 //     Users.updateOne({ phone }, { isOnline: true });
 // }
 

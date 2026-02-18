@@ -1,6 +1,6 @@
 const WebSocket = require("ws");
 const services = require("../services/signaling.service");
-
+const { randomUUID } = require("crypto");
 
 function setupWebsocket(server) {
 
@@ -9,6 +9,7 @@ function setupWebsocket(server) {
   wss.on('connection', (socket) => {
 
     console.log("Client connected via WebSocket");
+    socket.id = randomUUID();
 
     //send response to the client
     socket.send(JSON.stringify({
@@ -20,26 +21,26 @@ function setupWebsocket(server) {
 
       const userData = JSON.parse(data.toString());
 
-      console.log(userData['type']);
-      console.log(userData);
+      // console.log(userData['type']);
+      // console.log(socket);
 
       //Update inOnline when user comes online
       // services.userOnline(userData.phone);
 
       //  register the user 
-      if (data.type === "register") {
+      if (userData['type'] === "register") {
 
         services.register_user({phone: userData.phone }, socket);
 
-      } else if (data.type === "offer") {
+      } else if (userData['type'] === "offer") {
 
         services.forwardOffer({from: userData.from , to: userData.to, offer: userData.offer});
         
-      } else if (data.type === "answer"){
+      } else if (userData['type'] === "answer"){
 
         services.forwardAnswer({from: userData.from , to: userData.to, answer: userData.answer});
 
-      }else if (data.type === "ice"){
+      }else if (userData['type'] === "ice"){
 
         services.forwardICE({from: userData.from , to: userData.to, ice_candidate: userData.ice_candidate});
 
