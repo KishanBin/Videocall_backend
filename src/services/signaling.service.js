@@ -9,7 +9,7 @@ const { Users, Sockets } = require("../../config/tempStorage");
     if (!isExist) {
 
         Sockets.set(socket.id, { socket: socket, phone: phone });
-
+ 
          Users.set(phone, {
             phone: phone,
             socketId: socket.id,  //connection gets the socket it 
@@ -38,7 +38,7 @@ const { Users, Sockets } = require("../../config/tempStorage");
 }
 
  function forwardOffer({ from, to, offer }) {
-
+    
     const user =  Users.get(to);
 
     const targetSocket = Sockets.get(user.socketId).socket;
@@ -83,7 +83,7 @@ const { Users, Sockets } = require("../../config/tempStorage");
         targetSocket.send(JSON.stringify({
             type: "candidate",
             from: from,
-            ice: ice_candidate,
+            candidate: ice_candidate,
         }));
 
         console.log(`ice_candidate send ${from} to ${to}`);

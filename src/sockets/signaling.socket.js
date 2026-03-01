@@ -21,7 +21,7 @@ function setupWebsocket(server) {
 
       const userData = JSON.parse(data.toString());
 
-      // console.log(userData['type']);
+      console.log(userData['type']);
       // console.log(socket);
 
       //Update inOnline when user comes online
@@ -40,9 +40,9 @@ function setupWebsocket(server) {
 
         services.forwardAnswer({from: userData.from , to: userData.to, answer: userData.answer});
 
-      }else if (userData['type'] === "ice"){
+      }else if (userData['type'] === "candidate"){
 
-        services.forwardICE({from: userData.from , to: userData.to, ice_candidate: userData.ice_candidate});
+        services.forwardICE({from: userData.from , to: userData.to, ice_candidate: userData.candidate});
 
       }
 
